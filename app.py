@@ -3,10 +3,26 @@ import discord
 import json
 import os
 
-config = {
-  "Authorization": "<API-KEY>",
-  "session_token": os.environ["CHATGPT_SESSION_TOKEN"]
-}
+if not 'DISCORD_TOKEN' in os.environ:
+  raise Exception('Environment variable DISCORD_TOKEN is required')
+
+if 'CHATGPT_SESSION_TOKEN' in os.environ:
+  config = {
+    'Authorization': '<API-KEY>',
+    'session_token': os.environ['CHATGPT_SESSION_TOKEN']
+  }
+else:
+  if 'CHATGPT_EMAIL' in os.environ:
+    if 'CHATGPT_PASSWORD' in os.environ:
+      config = {
+        'email': os.environ['CHATGPT_EMAIL'],
+        'password': os.environ['CHATGPT_PASSWORD']
+      }
+    else:
+      raise Exception('CHATGPT_EMAIL requires CHATGPT_PASSWORD')
+  else:
+    raise Exception('ChatGPT requires credentials in environment variables: either CHATGPT_SESSION_TOKEN or a pair of CHATGPT_EMAIL and CHATGPT_PASSWORD')
+
 ai = Chatbot(config, conversation_id=None)
 ai.refresh_session()
 
