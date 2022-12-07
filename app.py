@@ -31,14 +31,14 @@ ai.refresh_session()
 
 class ChatBot(discord.Client):
   async def on_message(self, message):
-        # don't respond to ourselves
-        if message.author == self.user:
-            return
-        
-        if message.content == 'reset':
-          ai.reset_chat()
-          await message.channel.send("Reset AI conversation.")
-
+    # don't respond to ourselves
+    if message.author == self.user:
+        return
+    else:
+      if message.content == 'reset':
+        ai.reset_chat()
+        await message.channel.send("Reset AI conversation.")
+      else:
         if message.content.startswith('image'):
           await self.send_image(message)
         else:
