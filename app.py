@@ -38,28 +38,13 @@ class ChatBot(discord.Client):
         if message.content == 'reset':
           ai.reset_chat()
           await message.channel.send("Reset AI conversation.")
-        else:
-          input_prompt = message.content
-          if input_prompt.startswith('meme'):
-            response = openai.Image.create(
-              prompt=input_prompt,
-              n=1,
-              size="256x256"
-            )
-            image_url = response['data'][0]['url']
-            await self.send_discord_message(message, image_url)
-          else:
-            prompt = message.content
-            resp = ai.get_chat_response(prompt, output="text")
-            await self.send_discord_message(message, resp['message'])
 
-            response = openai.Image.create(
-              prompt=resp['message'],
-              n=1,
-              size="256x256"
-            )
-            image_url = response['data'][0]['url']
-            await self.send_discord_message(message, image_url)
+        if message.content.startswith('image'):
+          await self.send_image(message)
+        else:
+          prompt = message.content
+          resp = ai.get_chat_response(prompt, output="text")
+          await self.send_discord_message(message, resp['message'])
 
   async def send_discord_message(self, message, msg):
     import textwrap
@@ -69,6 +54,22 @@ class ChatBot(discord.Client):
         await message.channel.send(truncated_msg)
     else:
       await message.channel.send(msg)
+
+  async def send_image(self, message):
+    input_prompt = message.content
+    if input_prompt.startswith('image'):
+      prompt = input_prompt.split('image')[1]
+    else:
+      prompt = input_prompt
+
+
+    response = openai.Image.create(
+      prompt=prompt[:350],
+      n=1,
+      size="256x256"
+    )
+    image_url = response['data'][0]['url']
+    await self.send_discord_message(message, image_url)
 
 intents = discord.Intents.default()
 intents.message_content = True
