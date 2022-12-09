@@ -23,13 +23,54 @@ else:
   if not ('CHATGPT_EMAIL' in os.environ) and ('CHATGPT_PASSWORD' in os.environ):
     raise Exception('ChatGPT requires credentials in environment variables: either CHATGPT_SESSION_TOKEN or a pair of CHATGPT_EMAIL and CHATGPT_PASSWORD')
   else:
-    config = {
+    chatgpt_config = {
       'email': os.environ['CHATGPT_EMAIL'],
       'password': os.environ['CHATGPT_PASSWORD']
     }
+    chatgpt = Chatbot(config, conversation_id=None) # Needs a static conversation id for permanent training.. whoa
+    chatgpt.refresh_session()
 
-ai = Chatbot(config, conversation_id=None)
-ai.refresh_session()
+class ChatBot(discord.Client):
+  async def on_message(self, message):
+    # don't respond to ourselves
+    if message.author == self.user:
+        return
+    else:
+    # if message.content == 'reset':
+    #   ai.reset_chat()
+    #   await message.channel.send("Reset AI conversation.")
+      input_prompt = message.content
+
+      if input_prompt.startswith('image'):
+        response = openai.Image.create(
+          prompt=input_prompt,
+          n=1,
+          size="256x256"
+        )
+        image_url = response['data'][0]['url']
+        await self.send_discord_message(message, image_url)
+      else:
+        response = openai.Completion.create(
+          model="text-davinci-003",
+          prompt="""If people bring so much courage to this world the world has to kill them to break them, so of course it kills them. The world breaks every one and afterward many are strong at the broken places. But those that will not break it kills. It kills the very good and the very gentle and the very brave impartially. If you are none of these you can be sure it will kill you too but there will be no special hurry.""",
+          temperature=1.9,
+          max_tokens=60,
+          top_p=1.0,
+          frequency_penalty=0.5,
+          presence_penalty=0.0,
+          stop=[f"Sam: {input_prompt}"]
+        )
+        response_text = response.choices[0].text
+        await self.send_discord_message(message, response_text)
+
+  async def send_discord_message(self, message, msg):
+    import textwrap
+    truncated_messages = textwrap.wrap(msg, 2000)
+    if (len(truncated_messages) > 1):
+      for truncated_msg in truncated_messages:
+        await message.channel.send(truncated_msg)
+    else:
+      await message.channel.send(msg)
 
 intents = discord.Intents.default()
 # intents.members = True
