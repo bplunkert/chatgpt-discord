@@ -1,4 +1,0 @@
-discord>=2.1.0
-revChatGPT>=0.0.28
-openai
-SpeechRecognition
