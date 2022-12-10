@@ -73,7 +73,6 @@ class ChatBot(discord.Client):
       await message.channel.send(msg)
 
 intents = discord.Intents.default()
-# intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix='/', description="AI", intents=intents)
 
