@@ -1,0 +1,22 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "description": "A Discord bot with speech recognition",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.0.3",
+    "discord-speech-recognition": "^3.0.0",
+    "@discordjs/opus": "^0.7.0",
+    "ffmpeg-static": "^4.4.0",
+    "dotenv": "^16.0.0",
+    "libsodium-wrappers": "^0.7.13",
+    "openai": "^4.20.1",
+    "node-fetch": "^3.3.2"
+  }
+}
+
